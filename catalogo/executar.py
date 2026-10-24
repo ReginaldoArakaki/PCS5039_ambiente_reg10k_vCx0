@@ -10,6 +10,7 @@ from typing import Callable, Iterable, Optional
 
 from avaliacao.espelho import salvar_amostras
 from avaliacao.oraculo import avaliar, roteiro_sem_rede, tem_app, tem_falha_de_rede
+from hub.comportamento import analisar_comportamento
 from hub.controlador import Controlador, ControladorReferencia
 from sim.motor import simular
 
@@ -26,8 +27,10 @@ METRICAS_NUMERICAS = (
     "efeitos_duplicados_remotos", "reconciliacao_ms_max", "divergencia_alem_prazo_s",
     # v0dta
     "espelho_fiel_s", "erro_de_percepcao_s", "erro_de_sincronizacao_s", "espelho_nao_afirma_s",
+    # v0dtb
+    "cobertura_comportamental_pct", "tempo_inconclusivo_s", "episodios_ocupacao", "episodios_inconclusivos",
 )
-VERSAO = "v0dta"
+VERSAO = "v0dtb"
 
 
 # --------------------------------------------------------------- carregamento
@@ -94,6 +97,11 @@ def executar(roteiro: dict, fabrica, semente: int = SEMENTE_REFERENCIA, sala: Op
     if tem_falha_de_rede(roteiro) and not tem_app(roteiro):
         par = simular(sala, roteiro_sem_rede(roteiro), fabrica, semente).eventos
     av = avaliar(reg.eventos, roteiro, sala, esperado, par)
+    cfg = {**sala.get("controle", {}), **roteiro.get("controle", {})}
+    comportamento = analisar_comportamento(
+        reg.eventos, roteiro["duracao_ms"], cfg.get("t_apagamento_ms", 60_000)
+    )
+    av["metricas"].update(comportamento["metricas"])
     resumo = {
         "cenario": roteiro["id"],
         "controlador": nome,
@@ -105,11 +113,15 @@ def executar(roteiro: dict, fabrica, semente: int = SEMENTE_REFERENCIA, sala: Op
         "hash_eventos": reg.hash(),
         "n_eventos": len(reg.eventos),
         **av,
+        "comportamento": comportamento,
     }
     if salvar:
         pasta = SAIDA / roteiro["id"] / nome / str(semente)
         reg.salvar(pasta / "eventos.jsonl")
         salvar_amostras(pasta / "espelho", sala, roteiro, nome, av["espelho"]["amostras"])  # v0dta
+        (pasta / "comportamento.json").write_text(
+            json.dumps(comportamento, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
         (pasta / "metricas.json").write_text(json.dumps(resumo, ensure_ascii=False, indent=2), encoding="utf-8")
     resumo["_eventos"] = reg.eventos
     return resumo

@@ -1,4 +1,4 @@
-# PCS5039 — Ambiente de simulação Reg10k (v0dta)
+# PCS5039 — Ambiente de simulação Reg10k (v0dtb)
 
 Projeto de referência da disciplina **PCS5039 — Engenharia de Software Orientada a IoT** (EPUSP): automação de iluminação residencial em ambiente simulado.
 
@@ -8,8 +8,15 @@ A **v0dt** acrescenta o gêmeo digital (DTReg10k) sem mudar a sala: o **DTReg10k
 
 A **v0dta** (ajuste "a" da v0dt) acrescenta o **cômodo espelho**: a sala desenhada só com o que o gêmeo sabe, ao lado da sala real, com **amostras** (início, meio e fim) e a **fidelidade do espelho**, que separa a causa de cada diferença em percepção, sincronização ou "não afirma".
 
+A **v0dtb** acrescenta observação comportamental explicável somente no Hub: episódios de ocupação, perfil horário com cobertura e confiança, retenção estatística de 30 dias e sugestão contrafactual de `T_apagamento` sem aplicação automática. A ocupação continua significando pessoa ou animal de grande porte, sem identificação.
+
+O estudo reprodutível para publicação é gerado com `python -m tools.estudo_comportamental`. Por padrão, ele executa quatro cenários de 30 dias com 30 sementes e grava JSON, CSV e manifesto em `saida/estudo-comportamental/`.
+
 | Documento | Conteúdo |
 |---|---|
+| [`docs/ambiente-simulacao-v0dtb.md`](docs/ambiente-simulacao-v0dtb.md) | Premissas e entrega da v0dtb (comportamento local explicável) |
+| [`docs/requisitos-v0dtb.md`](docs/requisitos-v0dtb.md) | RF, RNF, invariantes e contrato dos dados para publicação |
+| [`docs/resultado-estudo-comportamental-v0dtb.md`](docs/resultado-estudo-comportamental-v0dtb.md) | Resultado de referência do experimento sintético de 30 dias |
 | [`docs/ambiente-simulacao-v0dta.md`](docs/ambiente-simulacao-v0dta.md) | Plano e entrega da v0dta (cômodo espelho) |
 | [`docs/ambiente-simulacao-v0dt.md`](docs/ambiente-simulacao-v0dt.md) | Plano e entrega da v0dt (gêmeo digital) |
 | [`docs/ambiente-simulacao-v02.md`](docs/ambiente-simulacao-v02.md) | Plano do incremento 0 (sala, dispositivos, controlador) |

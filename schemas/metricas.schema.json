@@ -120,6 +120,26 @@
         "espelho_nao_afirma_s": {
           "type": "number",
           "minimum": 0
+        },
+        "cobertura_comportamental_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "tempo_inconclusivo_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "episodios_ocupacao": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "episodios_inconclusivos": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "perfil_maduro": {
+          "type": "boolean"
         }
       }
     },
@@ -163,11 +183,26 @@
       "enum": [
         "v0",
         "v0dt",
-        "v0dta"
+        "v0dta",
+        "v0dtb"
       ]
     },
     "execucao_pareada": {
       "type": "boolean"
+    },
+    "comportamento": {
+      "type": "object",
+      "required": ["versao", "local_processamento", "retencao_dias", "episodios", "perfil_horario", "sugestao", "metricas"],
+      "properties": {
+        "versao": {"const": "v0dtb"},
+        "local_processamento": {"const": "HUB"},
+        "retencao_dias": {"const": 30},
+        "identifica_ocupante": {"const": false},
+        "episodios": {"type": "array"},
+        "perfil_horario": {"type": "array"},
+        "sugestao": {"type": "object"},
+        "metricas": {"type": "object"}
+      }
     },
     "espelho": {
       "type": "object",
