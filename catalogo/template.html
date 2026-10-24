@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Simulação Reg10k — v0dta</title>
+<title>Simulação Reg10k — v0dtb</title>
 <style>
 :root{
   --bg:#f6f7f9; --panel:#ffffff; --ink:#1d2330; --ink2:#566070; --line:#dfe3ea; --accent:#1f4e8c;
@@ -93,7 +93,7 @@ tr.click{cursor:pointer} tr.click:hover td{background:#f3f6fb} tr.sel td{backgro
 <body>
 <header>
   <div>
-    <h1>Simulação Reg10k — v0dta <span class="small muted" style="font-weight:500">sala do incremento 0 com gêmeo digital e cômodo espelho</span></h1>
+    <h1>Simulação Reg10k — <span id="versaoPagina">v0dtb</span> <span class="small muted" style="font-weight:500">gêmeo digital, cômodo espelho e observação comportamental no Hub</span></h1>
     <div class="sub" id="sub"></div>
   </div>
   <div style="flex:1"></div>
@@ -104,6 +104,7 @@ tr.click{cursor:pointer} tr.click:hover td{background:#f3f6fb} tr.sel td{backgro
   <button data-t="cenarios">Cenários</button>
   <button data-t="animacao">Animação</button>
   <button data-t="painel">Painel</button>
+  <button data-t="comportamento">Comportamento</button>
 </nav>
 <div class="toolbar" id="selbar">
   <label>Cenário <select id="selCen"></select></label>
@@ -115,6 +116,7 @@ tr.click{cursor:pointer} tr.click:hover td{background:#f3f6fb} tr.sel td{backgro
   <section class="tab" id="tab-cenarios"></section>
   <section class="tab" id="tab-animacao"></section>
   <section class="tab" id="tab-painel"></section>
+  <section class="tab" id="tab-comportamento"></section>
 </main>
 <div class="lightbox" id="lb"><img alt=""></div>
 
@@ -153,7 +155,7 @@ const S = {tab: "cenarios", cen: D.cenarios[0].id, ctrl: CTRLS[0], t: 0, playing
 function ex(cen = S.cen, ctrl = S.ctrl) { return D.execucoes[`${cen}|${ctrl}`]; }
 function lerHash() {
   const [tab, cen, ctrl] = location.hash.replace(/^#/, "").split("/");
-  if (["modelo","cenarios","animacao","painel"].includes(tab)) S.tab = tab;
+  if (["modelo","cenarios","animacao","painel","comportamento"].includes(tab)) S.tab = tab;
   if (cen && CEN[cen]) S.cen = cen;
   if (ctrl && CTRLS.includes(ctrl)) S.ctrl = ctrl;
 }
@@ -322,6 +324,7 @@ const csv = rows => rows.map(r => r.map(c => { const s = String(c ?? ""); return
 
 // ------------------------------------------------------------------- cabeçalho
 function cabecalho() {
+  $("#versaoPagina").textContent = D.meta.versao;
   const nDt = D.cenarios.filter(c => c.versao === "v0dt").length;
   $("#sub").textContent = `Sala de 5 × 4 m · morador e cachorro · gêmeo local e remoto · ${D.cenarios.length - nDt} cenários de regressão (v0) e ${nDt} do gêmeo · controladores: ${CTRLS.join(", ")} · gerado em ${D.meta.gerado_em}`;
   const p = D.meta.problemas;
@@ -341,7 +344,7 @@ function trocar() {
   gravarHash();
   document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === S.tab));
   document.querySelectorAll("section.tab").forEach(s => s.classList.toggle("on", s.id === `tab-${S.tab}`));
-  $("#selbar").style.display = (S.tab === "animacao" || S.tab === "painel") ? "flex" : "none";
+  $("#selbar").style.display = (["animacao", "painel", "comportamento"].includes(S.tab)) ? "flex" : "none";
   $("#selCen").value = S.cen; $("#selCtrl").value = S.ctrl;
   const e = ex(), c = CEN[S.cen];
   $("#selInfo").innerHTML = `${verTag(c)} ${tipoTag(c.tipo)} · ${c.modo.toLowerCase()}${e.modo_rede && e.modo_rede !== c.modo ? ` · rede ${e.modo_rede.toLowerCase()}` : ""} · ${fmtT(c.duracao_ms)} · requisitos ${e.requisitos.ok}/${e.requisitos.total} · ` +
@@ -350,6 +353,7 @@ function trocar() {
   if (S.tab === "cenarios") renderCenarios();
   if (S.tab === "animacao") montarAnimacao();
   if (S.tab === "painel") renderPainel();
+  if (S.tab === "comportamento") renderComportamento();
 }
 
 // ======================================================================= MODELO
@@ -457,7 +461,7 @@ function renderCenarios() {
       <div class="kv"><div>Ideal</div><div>${esc(c.comportamento_ideal || "")}</div><div>Referência</div><div>${esc(c.comportamento_referencia || "")}</div>
       <div>Requisitos</div><div>${(c.requisitos || []).map(r => `<span class="chip" data-rq="${r}">${r}</span>`).join("")}</div>
       <div>Regras</div><div>${(c.regras || []).map(r => `<span class="chip" data-rg="${r}">${r}</span>`).join("")}</div></div>
-      <div class="controls"><button class="b pri" data-goanim>▶ Ver animação</button><button class="b" data-gopainel>Ver painel</button><button class="b" data-edit>Abrir no editor</button></div>
+      <div class="controls"><button class="b pri" data-goanim>▶ Ver animação</button><button class="b" data-gopainel>Ver painel</button><button class="b" data-gocomport>Ver comportamento</button><button class="b" data-edit>Abrir no editor</button></div>
     </div><div>
       <h3 style="margin-top:0">Roteiro</h3><div class="tablebox" style="max-height:220px"><table><tr><th>t</th><th>Quem</th><th>Ação ou falha</th></tr>
       ${[...c.acoes.map(a => [a.t_ms, a.ocupante === "app" ? "App (titular)" : (NOMES[a.ocupante] || a.ocupante), a.acao + (a.comando ? ` ${a.comando}` : "") + (a.t_apagamento_ms ? ` T_apagamento = ${a.t_apagamento_ms / 1000} s` : "") + (a.ate ? ` → (${a.ate.join(", ")})` : "") + (a.duracao_ms ? ` por ${a.duracao_ms / 1000} s` : "") + (a.vel_m_s ? ` a ${a.vel_m_s} m/s` : "")]),
@@ -510,6 +514,7 @@ function renderCenarios() {
   T.querySelectorAll("[data-rq],[data-rg]").forEach(ch => ch.onclick = () => { S.modelSec = ch.dataset.rq ? "rastreio" : "regras"; irPara("modelo"); });
   T.querySelector("[data-goanim]").onclick = () => irPara("animacao");
   T.querySelector("[data-gopainel]").onclick = () => irPara("painel");
+  T.querySelector("[data-gocomport]").onclick = () => irPara("comportamento");
   T.querySelector("[data-edit]").onclick = () => { carregarNoEditor(CEN[S.cen]); $("#editor").scrollIntoView({behavior: "smooth"}); };
   $("#csvCat").onclick = () => baixar("catalogo-resultados.csv", csv([["cenario","tipo","titulo","modo","controlador","requisitos_ok","req_ok","req_total","ref_iguais","ref_total",...D.modelo.metricas.map(m => m.id)],
     ...D.cenarios.flatMap(x => CTRLS.map(k => { const e = ex(x.id, k); return [x.id, x.tipo, x.titulo, x.modo, k, e.requisitos_ok, e.requisitos.ok, e.requisitos.total, e.caracterizacao.igual_referencia, e.caracterizacao.total, ...D.modelo.metricas.map(m => e.metricas[m.id])]; }))]));
@@ -527,6 +532,42 @@ function renderCenarios() {
     T.querySelectorAll("[data-ver]").forEach(b => b.onclick = () => { S.t = Number(b.dataset.ver); S.visao = S.visaoAm; S.playing = false; irPara("animacao"); });
   }
   ligarEditor();
+}
+
+// ============================================================ COMPORTAMENTO v0dtb
+function pct(v) { return v == null ? "—" : `${(Number(v) * 100).toLocaleString("pt-BR", {maximumFractionDigits: 1})}%`; }
+function renderComportamento() {
+  const e = ex(), b = e.comportamento;
+  if (!b) {
+    $("#tab-comportamento").innerHTML = `<div class="card"><h2>Comportamento</h2><span class="pill warn">sem projeção v0dtb nesta execução</span></div>`;
+    return;
+  }
+  const r = b.resumo || {}, m = b.metricas || {}, s = b.sugestao || {};
+  const perfil = b.perfil_horario || [], episodios = b.episodios || [];
+  const estadoSug = s.estado === "PROPOSTA" ? "warn" : s.estado === "MANTER" ? "ok" : "n";
+  const maduro = r.maduro ? '<span class="pill ok">maduro</span>' : '<span class="pill warn">em observação</span>';
+  $("#tab-comportamento").innerHTML = `
+    <div class="card"><div class="controls" style="margin-top:0"><h2 style="margin:0">Catalogação comportamental — ${esc(S.cen)} / ${esc(S.ctrl)}</h2>
+      <span class="pill n">${esc(b.versao)}</span><span class="pill n">processamento ${esc(b.local_processamento)}</span><span class="pill n">retenção ${fmtN(b.retencao_dias)} dias</span>${maduro}</div>
+      <p class="small muted">A ocupação agrega pessoa ou animal de grande porte, sem identidade, posição ou distinção de espécie. A projeção usa somente registros locais do Hub.</p>
+      <div class="metrics">
+        <div class="metric"><div class="v">${fmtN(m.cobertura_comportamental_pct)}%</div><div class="n">cobertura observável</div></div>
+        <div class="metric"><div class="v">${fmtN(r.dias_no_periodo)}</div><div class="n">dias no período (mínimo ${fmtN(r.janela_minima_dias)})</div></div>
+        <div class="metric"><div class="v">${fmtN(m.episodios_ocupacao)}</div><div class="n">episódios ocupados</div></div>
+        <div class="metric"><div class="v">${fmtN(m.episodios_inconclusivos)}</div><div class="n">episódios inconclusivos</div></div>
+        <div class="metric"><div class="v">${fmtN(m.tempo_inconclusivo_s)} s</div><div class="n">tempo inconclusivo</div></div>
+        <div class="metric"><div class="v">${fmtN(b.eventos_locais_considerados)}</div><div class="n">eventos locais considerados</div></div>
+      </div></div>
+    <div class="card"><h2>Sugestão explicável de T_apagamento <span class="pill ${estadoSug}">${esc(s.estado)}</span></h2>
+      <div class="grid2"><div class="kv"><div>Valor atual</div><div>${fmtN(s.valor_atual / 1000)} s</div><div>Valor proposto</div><div>${s.valor_proposto == null ? "—" : fmtN(s.valor_proposto / 1000) + " s"}</div>
+      <div>Método</div><div>${esc(s.metodo || "—")}</div><div>Benefício estimado</div><div>${s.beneficio_estimado_ms == null ? "—" : fmtN(s.beneficio_estimado_ms / 1000) + " s"}</div></div>
+      <div class="kv"><div>Aplicação automática</div><div><b>não</b></div><div>Requer aceite</div><div>${s.requer_aceite ? "sim" : "não"}</div><div>Motivo</div><div>${esc(s.motivo || "dados suficientes para avaliação contrafactual")}</div></div></div></div>
+    <div class="grid2"><div class="card"><h2>Episódios</h2><div class="tablebox"><table><tr><th>ID</th><th>Estado</th><th>Início</th><th>Fim</th><th>Duração</th><th>Confiança</th></tr>
+      ${episodios.length ? episodios.map(x => `<tr><td class="mono">${esc(x.id)}</td><td>${esc(x.estado)}</td><td>${fmtT(x.inicio_ms)}</td><td>${fmtT(x.fim_ms)}</td><td>${fmtT(x.duracao_ms)}</td><td>${pct(x.confianca)}</td></tr>`).join("") : '<tr><td colspan="6" class="muted">Nenhum episódio derivado.</td></tr>'}
+      </table></div></div>
+      <div class="card"><h2>Perfil horário</h2><div class="tablebox"><table><tr><th>Tipo de dia</th><th>Hora</th><th>P(ocupação)</th><th>Cobertura</th><th>Dias</th><th>Confiança</th></tr>
+      ${perfil.length ? perfil.map(x => `<tr><td>${esc(x.tipo_dia)}</td><td>${String(x.hora).padStart(2,"0")}:00</td><td>${pct(x.probabilidade_ocupacao)}</td><td>${pct(x.cobertura)}</td><td>${fmtN(x.dias_observados)}</td><td>${pct(x.confianca)}</td></tr>`).join("") : '<tr><td colspan="6" class="muted">Sem faixas observáveis.</td></tr>'}
+      </table></div></div></div>`;
 }
 
 // ------------------------------------------------------------- editor de roteiro

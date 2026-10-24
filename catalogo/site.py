@@ -75,6 +75,8 @@ def montar_dados(cat: dict) -> dict:
             # v0dta: segmentos de fidelidade, amostras e os mesmos SVG gravados em saida/.../espelho/
             "espelho": {**e["espelho"], "svg": {v: [svg_amostra(cat["sala"], a, _titulo(e, a), v)
                                                     for a in e["espelho"]["amostras"]] for v in ("R", "L")}},
+            # v0dtb: projeção comportamental produzida exclusivamente no Hub.
+            "comportamento": e.get("comportamento"),
             "distribuicao": e.get("distribuicao"),
             "eventos": evs,
         }
