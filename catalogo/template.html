@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Simulação Reg10k — v0dtb</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23122d3c'/%3E%3Cpath d='M13 30 32 14l19 16v21H38V38H26v13H13Z' fill='none' stroke='%2372d6c9' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='27' r='6' fill='%23ffd84d'/%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#f6f7f9; --panel:#ffffff; --ink:#1d2330; --ink2:#566070; --line:#dfe3ea; --accent:#1f4e8c;
@@ -88,23 +89,39 @@ tr.click{cursor:pointer} tr.click:hover td{background:#f3f6fb} tr.sel td{backgro
   header .acts,nav.tabs,.toolbar,.controls,.noprint{display:none!important}
   body{background:#fff} .card{break-inside:avoid;border-color:#ccc} .tablebox{max-height:none;overflow:visible}
 }
+/* v0dtb: camada de usabilidade inspirada no laboratório original */
+header{background:#122d3c;color:#fff;border-bottom:0;padding:18px 28px 0;align-items:flex-start}
+header h1{font-size:22px;letter-spacing:-.45px} header .sub{color:#a9c1cd;margin-top:3px}
+.brand{display:flex;align-items:center;gap:13px}.brandmark{width:44px;height:44px;border:1px solid #54788a;border-radius:12px;display:grid;place-items:center;background:#183949;flex:0 0 auto}
+.brandmark svg{width:29px;height:29px}.eyebrow{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:#8fb2c2;font-weight:700;margin-bottom:2px}
+header .acts{padding-top:11px}.tabs{box-shadow:0 2px 12px #122d3c12}
+nav.tabs{padding:0 28px;gap:22px;position:sticky}nav.tabs button{padding:12px 2px 13px;color:#637783;border-bottom-width:3px}nav.tabs button.on{color:#155f71;border-bottom-color:#36a99d}
+nav.tabs button .navnum{font-size:10px;opacity:.65;margin-right:6px}
+main{max-width:1500px;margin:auto;padding:22px 28px 42px}.toolbar{padding:11px 28px}.card{border-radius:12px;box-shadow:0 3px 18px #172c3b08}
+.catalog-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px}.summary-card strong{font-size:22px;display:block;letter-spacing:-.5px}.summary-card span{font-size:11px;color:var(--ink2)}
+.scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:14px}.scenario-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:16px;border:1px solid var(--line);border-radius:11px;background:#fff;color:inherit;min-height:174px;box-shadow:0 2px 12px #172c3b06}.scenario-card:hover{border-color:#4f94a5;transform:translateY(-1px);box-shadow:0 7px 22px #172c3b13}.scenario-card.sel{border-color:#20847e;box-shadow:0 0 0 2px #20847e22}.scenario-card h3{font-size:14px;margin:0}.scenario-card p{font-size:12px;color:var(--ink2);margin:0}.scenario-card .scenario-foot{margin-top:auto;display:flex;gap:6px;flex-wrap:wrap}.scenario-head{width:100%;display:flex;align-items:center;gap:7px}.scenario-head .scenario-status{margin-left:auto}.scenario-id{font:700 11px ui-monospace,Consolas,monospace;color:#155f71}
+.quick-actions{display:flex;gap:8px;flex-wrap:wrap}.quick-actions .b{display:inline-flex;align-items:center;gap:6px}
+@media (max-width:1050px){.scenario-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.catalog-summary{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:650px){header{padding:14px 16px 0}.tagline{display:none}nav.tabs{padding:0 16px;gap:13px;overflow:auto}.scenario-grid,.catalog-summary{grid-template-columns:1fr}main{padding:16px}.toolbar{padding:10px 16px}.brandmark{width:38px;height:38px}.navnum{display:none}}
 </style>
 </head>
 <body>
 <header>
-  <div>
-    <h1>Simulação Reg10k — <span id="versaoPagina">v0dtb</span> <span class="small muted" style="font-weight:500">gêmeo digital, cômodo espelho e observação comportamental no Hub</span></h1>
-    <div class="sub" id="sub"></div>
+  <div class="brand">
+    <div class="brandmark" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M9 29 32 10l23 19v25H39V39H25v15H9Z" fill="none" stroke="#72d6c9" stroke-width="4" stroke-linejoin="round"/><circle cx="32" cy="27" r="7" fill="#ffd84d"/><path d="M28 19h8M23 23l-5-3M41 23l5-3" stroke="#ffd84d" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+    <div><div class="eyebrow">EPUSP · PCS5039 · Digital Twin</div>
+    <h1>Laboratório Reg10k · <span id="versaoPagina">v0dtb</span></h1>
+    <div class="sub" id="sub"></div></div>
   </div>
   <div style="flex:1"></div>
-  <div class="acts" id="status"></div>
+  <div class="acts"><span class="tagline small" style="color:#a9c1cd;margin-right:10px">Gêmeo digital · espelho · comportamento no Hub</span><span id="status"></span></div>
 </header>
 <nav class="tabs" id="tabs">
-  <button data-t="modelo">Modelo</button>
-  <button data-t="cenarios">Cenários</button>
-  <button data-t="animacao">Animação</button>
-  <button data-t="painel">Painel</button>
-  <button data-t="comportamento">Comportamento</button>
+  <button data-t="modelo"><span class="navnum">01</span>Modelo</button>
+  <button data-t="cenarios"><span class="navnum">02</span>Cenários</button>
+  <button data-t="animacao"><span class="navnum">03</span>Animação</button>
+  <button data-t="painel"><span class="navnum">04</span>Painel</button>
+  <button data-t="comportamento"><span class="navnum">05</span>Comportamento</button>
 </nav>
 <div class="toolbar" id="selbar">
   <label>Cenário <select id="selCen"></select></label>
@@ -442,26 +459,36 @@ function renderCenarios() {
     (!b || `${c.id} ${c.titulo} ${(c.requisitos || []).join(" ")} ${(c.regras || []).join(" ")}`.toLowerCase().includes(b)));
   const c = CEN[S.cen];
   const tipos = Object.keys(TIPO_NOME);
-  let h = `<div class="card"><div class="controls" style="margin-top:0">
+  const aprovados = lista.filter(x => ex(x.id, S.ctrl)?.requisitos_ok).length;
+  const dt = lista.filter(x => x.versao === "v0dt").length;
+  const comIncerteza = lista.filter(x => (ex(x.id, S.ctrl)?.metricas?.tempo_inconclusivo_s || 0) > 0).length;
+  let h = `<div class="catalog-summary">
+      <div class="summary-card"><strong>${lista.length}</strong><span>cenários visíveis</span></div>
+      <div class="summary-card"><strong>${aprovados}</strong><span>aprovados em ${esc(S.ctrl)}</span></div>
+      <div class="summary-card"><strong>${dt}</strong><span>cenários do gêmeo digital</span></div>
+      <div class="summary-card"><strong>${comIncerteza}</strong><span>com intervalo inconclusivo</span></div></div>
+    <div class="card"><div class="controls" style="margin-top:0">
       <label class="small">Tipo <select id="fTipo"><option value="">todos</option>${tipos.map(t => `<option value="${t}"${S.filtroTipo === t ? " selected" : ""}>${TIPO_NOME[t]}</option>`).join("")}</select></label>
       <label class="small">Versão <select id="fVer"><option value="">todas</option><option value="v0"${S.filtroVer === "v0" ? " selected" : ""}>v0 (regressão)</option><option value="v0dt"${S.filtroVer === "v0dt" ? " selected" : ""}>v0dt (gêmeo)</option></select></label>
       <input type="text" id="fBusca" placeholder="Buscar ID, título, requisito ou regra" value="${esc(S.busca)}" style="min-width:280px">
       <span class="small muted">${lista.length} de ${D.cenarios.length} cenários · ${tipos.map(t => `${TIPO_NOME[t]}: ${D.cenarios.filter(x => x.tipo === t).length}`).join(" · ")}</span>
-      <span style="flex:1"></span><button class="b" id="csvCat">Exportar CSV</button></div>
-    <div class="tablebox" style="max-height:480px"><table><tr><th>ID</th><th>Versão</th><th>Tipo</th><th>Cenário</th><th>Modo</th><th>Duração</th>${CTRLS.map(k => `<th>${esc(k)}</th>`).join("")}</tr>
-    ${lista.map(x => `<tr class="click${x.id === S.cen ? " sel" : ""}" data-c="${x.id}"><td class="mono"><b>${x.id}</b></td><td>${verTag(x)}</td><td>${tipoTag(x.tipo)}</td><td>${esc(x.titulo)}</td><td class="small">${x.modo.toLowerCase()}${x.rede?.modo && x.rede.modo !== x.modo ? `<br>rede ${x.rede.modo.toLowerCase()}` : ""}</td><td class="small">${fmtT(x.duracao_ms)}</td>${CTRLS.map(k => `<td>${resultadoCel(x.id, k)}</td>`).join("")}</tr>`).join("")}
-    </table></div></div>`;
+      <span style="flex:1"></span><button class="b" id="csvCat">↓ Exportar CSV</button></div>
+    <div class="scenario-grid">${lista.map(x => { const e = ex(x.id, S.ctrl), m = e.metricas, ok = e.requisitos_ok;
+      return `<button class="scenario-card${x.id === S.cen ? " sel" : ""}" data-c="${x.id}">
+        <div class="scenario-head"><span class="scenario-id">${x.id}</span>${verTag(x)} ${tipoTag(x.tipo)}<span class="scenario-status pill ${ok ? "ok" : "bad"}">${ok ? "aprovado" : "falha"}</span></div>
+        <h3>${esc(x.titulo)}</h3><p>${esc(x.descricao || "Sem descrição.")}</p>
+        <div class="scenario-foot"><span class="pill n">${x.modo.toLowerCase()}</span><span class="pill n">${fmtT(x.duracao_ms)}</span><span class="pill n">escuro ${fmtN(m.escuro_com_ocupante_s)} s</span><span class="pill n">cobertura ${fmtN(m.cobertura_comportamental_pct)}%</span></div></button>`; }).join("")}</div></div>`;
 
   // Detalhe do cenário selecionado
   const asserts = (c.esperado?.assercoes || []);
   const par = ex(c.id, S.ctrl).execucao_pareada ? (ex(c.id, S.ctrl).invariantes["OR-12"].ok ? '<span class="pill ok">OR-12: decisões locais idênticas sem a falha de rede</span>' : '<span class="pill bad">OR-12: decisões locais mudaram com a rede</span>') : "";
-  h += `<div class="card"><h2>${c.id} — ${esc(c.titulo)} ${verTag(c)} ${tipoTag(c.tipo)} ${par}</h2>
+  h += `<div class="card" id="cenarioDetalhe"><h2>${c.id} — ${esc(c.titulo)} ${verTag(c)} ${tipoTag(c.tipo)} ${par}</h2>
     <div class="grid2"><div>
       <p>${esc(c.descricao || "")}</p>
       <div class="kv"><div>Ideal</div><div>${esc(c.comportamento_ideal || "")}</div><div>Referência</div><div>${esc(c.comportamento_referencia || "")}</div>
       <div>Requisitos</div><div>${(c.requisitos || []).map(r => `<span class="chip" data-rq="${r}">${r}</span>`).join("")}</div>
       <div>Regras</div><div>${(c.regras || []).map(r => `<span class="chip" data-rg="${r}">${r}</span>`).join("")}</div></div>
-      <div class="controls"><button class="b pri" data-goanim>▶ Ver animação</button><button class="b" data-gopainel>Ver painel</button><button class="b" data-gocomport>Ver comportamento</button><button class="b" data-edit>Abrir no editor</button></div>
+      <div class="quick-actions"><button class="b pri" data-goanim>▶ Ver animação</button><button class="b" data-gopainel>▦ Ver painel</button><button class="b" data-gocomport>◉ Ver comportamento</button><button class="b" data-edit>✎ Abrir no editor</button></div>
     </div><div>
       <h3 style="margin-top:0">Roteiro</h3><div class="tablebox" style="max-height:220px"><table><tr><th>t</th><th>Quem</th><th>Ação ou falha</th></tr>
       ${[...c.acoes.map(a => [a.t_ms, a.ocupante === "app" ? "App (titular)" : (NOMES[a.ocupante] || a.ocupante), a.acao + (a.comando ? ` ${a.comando}` : "") + (a.t_apagamento_ms ? ` T_apagamento = ${a.t_apagamento_ms / 1000} s` : "") + (a.ate ? ` → (${a.ate.join(", ")})` : "") + (a.duracao_ms ? ` por ${a.duracao_ms / 1000} s` : "") + (a.vel_m_s ? ` a ${a.vel_m_s} m/s` : "")]),
@@ -510,7 +537,7 @@ function renderCenarios() {
   $("#fTipo").onchange = e => { S.filtroTipo = e.target.value; renderCenarios(); };
   $("#fVer").onchange = e => { S.filtroVer = e.target.value; renderCenarios(); };
   $("#fBusca").oninput = e => { S.busca = e.target.value; const pos = e.target.selectionStart; renderCenarios(); const i = $("#fBusca"); i.focus(); i.setSelectionRange(pos, pos); };
-  T.querySelectorAll("tr[data-c]").forEach(r => r.onclick = () => { S.cen = r.dataset.c; S.t = 0; renderCenarios(); gravarHash(); T.querySelector(".card:nth-child(2)").scrollIntoView({behavior: "smooth", block: "start"}); });
+  T.querySelectorAll("[data-c]").forEach(r => r.onclick = () => { S.cen = r.dataset.c; S.t = 0; renderCenarios(); gravarHash(); $("#cenarioDetalhe").scrollIntoView({behavior: "smooth", block: "start"}); });
   T.querySelectorAll("[data-rq],[data-rg]").forEach(ch => ch.onclick = () => { S.modelSec = ch.dataset.rq ? "rastreio" : "regras"; irPara("modelo"); });
   T.querySelector("[data-goanim]").onclick = () => irPara("animacao");
   T.querySelector("[data-gopainel]").onclick = () => irPara("painel");
